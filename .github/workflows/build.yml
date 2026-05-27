@@ -37,3 +37,21 @@ jobs:
         with:
           name: Gra-3DS-Aplikacja
           path: ./output_3ds
+
+  build-wii:
+    name: Budowanie wersji Nintendo Wii
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobranie kodu z repozytorium
+        uses: actions/checkout@v4
+
+      - name: Kompilacja Wii przez Docker
+        run: |
+          mkdir -p output_wii
+          docker build -f docker/Dockerfile.wii --target exporter -o ./output_wii .
+
+      - name: Zapisanie gotowego pliku Wii
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gra-Wii-Aplikacja
+          path: ./output_wii
