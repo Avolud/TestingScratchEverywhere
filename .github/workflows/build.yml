@@ -1,0 +1,39 @@
+name: Kompilacja Scratch Everywhere
+on: [workflow_dispatch] # Pozwala na ręczne uruchomienie przyciskiem
+
+jobs:
+  build-wiiu:
+    name: Budowanie wersji Wii U
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobranie kodu z repozytorium
+        uses: actions/checkout@v4
+
+      - name: Kompilacja Wii U przez Docker
+        run: |
+          mkdir -p output_wiiu
+          docker build -f docker/Dockerfile.wiiu --target exporter -o ./output_wiiu .
+
+      - name: Zapisanie gotowego pliku Wii U
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gra-WiiU-Aplikacja
+          path: ./output_wiiu
+
+  build-3ds:
+    name: Budowanie wersji 3DS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobranie kodu z repozytorium
+        uses: actions/checkout@v4
+
+      - name: Kompilacja 3DS przez Docker
+        run: |
+          mkdir -p output_3ds
+          docker build -f docker/Dockerfile.3ds --target exporter -o ./output_3ds .
+
+      - name: Zapisanie gotowego pliku 3DS
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gra-3DS-Aplikacja
+          path: ./output_3ds
