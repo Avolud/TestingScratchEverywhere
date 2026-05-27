@@ -28,9 +28,9 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM.cmake")
 endif()
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM.cmake")
 
-set(SE_APP_NAME "Scratch Everywhere!" CACHE STRING "Name of the outputed app.")
-set(SE_APP_DESCRIPTION "Play Scratch games on anything!" CACHE STRING "Description of the outputed app.")
-set(SE_APP_AUTHOR "Scratch Everywhere! Contributors" CACHE STRING "Author of the outputed app.")
+set(SE_APP_NAME "Test" CACHE STRING "Name of the outputed app.")
+set(SE_APP_DESCRIPTION "Testing!" CACHE STRING "Description of the outputed app.")
+set(SE_APP_AUTHOR "Avolud" CACHE STRING "Author of the outputed app.")
 set(SE_APP_VERSION "1.0-rc2" CACHE STRING "Version of the outputed app.")
 
 if(VITA)
