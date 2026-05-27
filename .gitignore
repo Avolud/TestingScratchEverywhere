@@ -5,8 +5,8 @@
 out/
 build/
 build-*/
-romfs/project/
-romfs/gfx
+# romfs/project/
+# romfs/gfx
 scratch-everywhere/
 
 # CMake
