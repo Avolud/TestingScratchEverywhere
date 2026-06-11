@@ -55,3 +55,39 @@ jobs:
         with:
           name: Gra-Wii-Aplikacja
           path: ./output_wii
+
+  build-gamecube:
+    name: Budowanie wersji GameCube
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobranie kodu z repozytorium
+        uses: actions/checkout@v4
+
+      - name: Kompilacja GameCube przez Docker
+        run: |
+          mkdir -p output_gamecube
+          docker build -f docker/Dockerfile.gamecube --target exporter -o ./output_gamecube .
+
+      - name: Zapisanie gotowego pliku GameCube
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gra-GameCube-Aplikacja
+          path: ./output_gamecube
+
+  build-vita:
+    name: Budowanie wersji PS Vita
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobranie kodu z repozytorium
+        uses: actions/checkout@v4
+
+      - name: Kompilacja PS Vita przez Docker
+        run: |
+          mkdir -p output_vita
+          docker build -f docker/Dockerfile.vita --target exporter -o ./output_vita .
+
+      - name: Zapisanie gotowego pliku PS Vita
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gra-PSVita-Aplikacja
+          path: ./output_vita
