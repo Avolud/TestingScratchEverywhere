@@ -1,8 +1,5 @@
 #include "input.hpp"
 #include <log.hpp>
-#include <fstream>
-#include <algorithm>
-#include <cctype>
 
 std::vector<std::string> Input::inputButtons;
 std::map<std::string, std::string> Input::inputControls;
@@ -41,89 +38,35 @@ void Input::applyControls(std::string controlsFilePath) {
         }
     }
 
-    // --- DOMYŚLNE STEROWANIE DLA 4 GRACZY ---
-
-    // Domyślny pojedynczy kontroler / Gracz 1 (P1)
-    Input::inputControls["dpadUp"] = "up arrow";
-    Input::inputControls["dpadDown"] = "down arrow";
-    Input::inputControls["dpadLeft"] = "left arrow";
-    Input::inputControls["dpadRight"] = "right arrow";
-    Input::inputControls["LeftStickUp"] = "up arrow";
-    Input::inputControls["LeftStickDown"] = "down arrow";
-    Input::inputControls["LeftStickLeft"] = "left arrow";
-    Input::inputControls["LeftStickRight"] = "right arrow";
+    // default controls
+    Input::inputControls["dpadUp"] = "u";
+    Input::inputControls["dpadDown"] = "h";
+    Input::inputControls["dpadLeft"] = "g";
+    Input::inputControls["dpadRight"] = "j";
     Input::inputControls["A"] = "a";
     Input::inputControls["B"] = "b";
     Input::inputControls["X"] = "x";
     Input::inputControls["Y"] = "y";
     Input::inputControls["shoulderL"] = "l";
     Input::inputControls["shoulderR"] = "r";
-
-    // P1 (Prefiks P1_)
-    Input::inputControls["P1_dpadUp"] = "up arrow";
-    Input::inputControls["P1_dpadDown"] = "down arrow";
-    Input::inputControls["P1_dpadLeft"] = "left arrow";
-    Input::inputControls["P1_dpadRight"] = "right arrow";
-    Input::inputControls["P1_LeftStickUp"] = "up arrow";
-    Input::inputControls["P1_LeftStickDown"] = "down arrow";
-    Input::inputControls["P1_LeftStickLeft"] = "left arrow";
-    Input::inputControls["P1_LeftStickRight"] = "right arrow";
-    Input::inputControls["P1_A"] = "a";
-    Input::inputControls["P1_B"] = "b";
-    Input::inputControls["P1_X"] = "x";
-    Input::inputControls["P1_Y"] = "y";
-
-    // P2 (WASD + Spacja + Z)
-    Input::inputControls["P2_dpadUp"] = "w";
-    Input::inputControls["P2_dpadDown"] = "s";
-    Input::inputControls["P2_dpadLeft"] = "a";
-    Input::inputControls["P2_dpadRight"] = "d";
-    Input::inputControls["P2_LeftStickUp"] = "w";
-    Input::inputControls["P2_LeftStickDown"] = "s";
-    Input::inputControls["P2_LeftStickLeft"] = "a";
-    Input::inputControls["P2_LeftStickRight"] = "d";
-    Input::inputControls["P2_A"] = "space";
-    Input::inputControls["P2_B"] = "z";
-    Input::inputControls["P2_X"] = "c";
-    Input::inputControls["P2_Y"] = "v";
-
-    // P3 (IJKL + U + O)
-    Input::inputControls["P3_dpadUp"] = "i";
-    Input::inputControls["P3_dpadDown"] = "k";
-    Input::inputControls["P3_dpadLeft"] = "j";
-    Input::inputControls["P3_dpadRight"] = "l";
-    Input::inputControls["P3_LeftStickUp"] = "i";
-    Input::inputControls["P3_LeftStickDown"] = "k";
-    Input::inputControls["P3_LeftStickLeft"] = "j";
-    Input::inputControls["P3_LeftStickRight"] = "l";
-    Input::inputControls["P3_A"] = "u";
-    Input::inputControls["P3_B"] = "o";
-
-    // P4 (Numpad 8546 + 7 + 9)
-    Input::inputControls["P4_dpadUp"] = "8";
-    Input::inputControls["P4_dpadDown"] = "5";
-    Input::inputControls["P4_dpadLeft"] = "4";
-    Input::inputControls["P4_dpadRight"] = "6";
-    Input::inputControls["P4_LeftStickUp"] = "8";
-    Input::inputControls["P4_LeftStickDown"] = "5";
-    Input::inputControls["P4_LeftStickLeft"] = "4";
-    Input::inputControls["P4_LeftStickRight"] = "6";
-    Input::inputControls["P4_A"] = "7";
-    Input::inputControls["P4_B"] = "9";
+    Input::inputControls["start"] = "1";
+    Input::inputControls["back"] = "0";
+    Input::inputControls["LeftStickRight"] = "right arrow";
+    Input::inputControls["LeftStickLeft"] = "left arrow";
+    Input::inputControls["LeftStickDown"] = "down arrow";
+    Input::inputControls["LeftStickUp"] = "up arrow";
+    Input::inputControls["LeftStickPressed"] = "c";
+    Input::inputControls["RightStickRight"] = "5";
+    Input::inputControls["RightStickLeft"] = "4";
+    Input::inputControls["RightStickDown"] = "3";
+    Input::inputControls["RightStickUp"] = "2";
+    Input::inputControls["RightStickPressed"] = "v";
+    Input::inputControls["LT"] = "z";
+    Input::inputControls["RT"] = "f";
 }
 
 void Input::buttonPress(std::string button) {
     if (Input::inputControls.find(button) != Input::inputControls.end()) {
-        Input::inputButtons.push_back(Input::inputControls[button]);
-    }
-}
-
-// Przeciążenie pozwalające na przekazywanie nazwy przycisku i numeru gracza (0, 1, 2, 3)
-void Input::buttonPress(std::string button, int playerIndex) {
-    std::string playerButton = "P" + std::to_string(playerIndex + 1) + "_" + button;
-    if (Input::inputControls.find(playerButton) != Input::inputControls.end()) {
-        Input::inputButtons.push_back(Input::inputControls[playerButton]);
-    } else if (Input::inputControls.find(button) != Input::inputControls.end()) {
         Input::inputButtons.push_back(Input::inputControls[button]);
     }
 }

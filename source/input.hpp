@@ -32,7 +32,6 @@ class Input {
 
     static void applyControls(std::string controlsFilePath = "");
     static void buttonPress(std::string button);
-    static void buttonPress(std::string button, int playerIndex); // <-- DODANA LINIA
     static std::string convertToKey(const Value keyName, const bool uppercaseKeys = false);
     static bool checkSequenceMatch(const std::vector<std::string> sequence);
 
