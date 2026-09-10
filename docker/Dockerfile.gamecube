@@ -1,9 +1,15 @@
-FROM ghcr.io/extremscorner/libogc2:latest AS main_builder
-WORKDIR /app
+FROM devkitpro/devkitppc:latest AS builder
 
+WORKDIR /app
 COPY . .
 
-RUN /opt/devkitpro/libogc2/gamecube/bin/powerpc-eabi-cmake -B build-gamecube -DCMAKE_BUILD_TYPE=Release && cmake --build build-gamecube -j2
+# Ustawienie zmiennych środowiskowych pod GameCube
+ENV GEKKO=1
+ENV HW_DOL=1
+
+# Kompilacja projektu pod profil GameCube
+RUN make -f Makefile.gamecube || make PLATFORM=gamecube
 
 FROM scratch AS exporter
-COPY --from=main_builder /app/build-gamecube/scratch-gamecube.dol /
+# Kopiowanie wygenerowanego pliku .dol do artefaktów GitHuba
+COPY --from=builder /app/*.dol /

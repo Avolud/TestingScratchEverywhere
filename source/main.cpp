@@ -1,169 +1,38 @@
-#ifndef LIBRETRO
-#include "image.hpp"
-#include "translation.hpp"
-#include <log.hpp>
-#ifdef ENABLE_MENU
-#include <menus/mainMenu.hpp>
-#endif
-#include <cstdlib>
-#include <inspector.hpp>
-#include <menus/mainMenu.hpp>
-#include <render.hpp>
-#include <runtime.hpp>
-#include <unzip.hpp>
+#include <gccore.h>
 
-#ifdef ENABLE_AUDIO
-#include <audio.hpp>
-#endif
+void init_gamecube_controllers() {
+    // Inicjalizacja fizycznych portów padów GameCube
+    PAD_Init();
 
-#ifdef __SWITCH__
-#include <switch.h>
+#ifdef HW_RVL
+    // Kod Wiimote/Nunchuk uruchomi się TYLKO na Nintendo Wii
+    WPAD_Init();
 #endif
-
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten_browser_file.h>
-#include <filesystem.hpp>
-#endif
-
-static void exitApp() {
-    Render::deInit();
-    OS::deinit();
 }
 
-static bool initApp() {
-    return Scratch::initializeRuntime();
+void update_gamecube_input() {
+    // Skanowanie przycisków na GameCube
+    PAD_ScanPads();
+    
+    // Odczyt z pierwszego kontrolera (Port 1)
+    u16 pressed = PAD_ButtonsDown(0);
+    s8 stick_x = PAD_StickX(0);
+    s8 stick_y = PAD_StickY(0);
+
+    // Mapowanie na akcje ze Scratcha:
+    if (pressed & PAD_BUTTON_A) {
+        // Przycisk A -> Spacja / Skok / Kliknięcie
+    }
+    if (pressed & PAD_BUTTON_B) {
+        // Przycisk B -> Atak / Anuluj
+    }
+    if (pressed & PAD_BUTTON_START) {
+        // START -> Enter / Pauza
+    }
+
+    // Ruch analogiem z uwzględnieniem martwej strefy (Deadzone)
+    if (stick_x > 18)  { /* Strzałka w prawo */ }
+    if (stick_x < -18) { /* Strzałka w lewo */ }
+    if (stick_y > 18)  { /* Strzałka w górę */ }
+    if (stick_y < -18) { /* Strzałka w dół */ }
 }
-
-bool activateMainMenu() {
-#ifdef ENABLE_MENU
-    MainMenu *menu = new MainMenu();
-    if (Unzip::filePath.empty()) MenuManager::changeMenu(menu);
-
-    while (Render::appShouldRun()) {
-        MenuManager::render();
-
-        if (MenuManager::isProjectLoaded != 0) {
-            if (MenuManager::isProjectLoaded == -1) return false;
-            MenuManager::isProjectLoaded = 0;
-            return true;
-        }
-
-#ifdef __EMSCRIPTEN__
-        emscripten_sleep(0);
-#endif
-#ifdef ENABLE_INSPECTOR
-        Inspector::processCommands();
-#endif
-    }
-#endif
-    return false;
-}
-
-void mainLoop() {
-    Scratch::startScratchProject();
-    if (Scratch::nextProject) {
-        Log::log(Unzip::filePath);
-        if (!Unzip::load()) {
-            if (Unzip::projectOpened == -3) { // main menu
-                if (!activateMainMenu()) {
-                    exitApp();
-                    exit(0);
-                }
-            } else {
-                exitApp();
-                exit(0);
-            }
-        }
-
-        return;
-    }
-    Unzip::filePath = "";
-    Scratch::nextProject = false;
-    Scratch::dataNextProject = Value();
-    if (OS::toExit || !activateMainMenu()) {
-        exitApp();
-        exit(0);
-    }
-}
-
-#if defined(WINDOWING_SDL1) || defined(WINDOWING_SDL2)
-#include <SDL.h>
-
-extern "C" int main(int argc, char **argv) {
-#else
-int main(int argc, char **argv) {
-#endif
-    if (!initApp()) {
-        exitApp();
-        return 1;
-    }
-
-    srand(time(NULL));
-
-    bool enableInspector = false;
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if (arg == "--inspector") {
-            enableInspector = true;
-        } else if (Unzip::filePath.empty()) {
-#if defined(__PC__)
-            Unzip::filePath = arg;
-#endif
-        }
-    }
-
-#ifdef ENABLE_INSPECTOR
-    if (enableInspector) Inspector::init();
-#endif
-
-#if defined(__EMSCRIPTEN__)
-    if (argc > 1) {
-        while (!FileSystem::fileExists("/romfs/project.sb3")) {
-            if (!Render::appShouldRun()) {
-                exitApp();
-                exit(0);
-            }
-            emscripten_sleep(0);
-        }
-    }
-#endif
-
-    if (!Unzip::load()) {
-        if (Unzip::projectOpened == -3) {
-#ifdef __EMSCRIPTEN__
-            bool uploadComplete = false;
-            emscripten_browser_file::upload(".sb3", [](std::string const &filename, std::string const &mime_type, std::string_view buffer, void *userdata) {
-                *(bool *)userdata = true;
-                if (!FileSystem::fileExists(OS::getScratchFolderLocation())) FileSystem::createDirectory(OS::getScratchFolderLocation());
-                std::ofstream f(OS::getScratchFolderLocation() + filename);
-                f << buffer;
-                f.close();
-                Unzip::filePath = OS::getScratchFolderLocation() + filename;
-                Unzip::load(); // TODO: Error handling
-            },
-                                            &uploadComplete);
-            while (Render::appShouldRun() && !uploadComplete)
-                emscripten_sleep(0);
-#else
-            if (!activateMainMenu()) {
-                exitApp();
-                return 0;
-            }
-#endif
-        } else {
-            exitApp();
-            return 0;
-        }
-    }
-
-#ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(mainLoop, 0, 1);
-#else
-    while (1)
-        mainLoop();
-#endif
-    exitApp();
-    return 0;
-}
-#endif
