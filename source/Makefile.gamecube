@@ -6,8 +6,8 @@ include $(DEVKITPPC)/gamecube_rules
 
 TARGET   := gamecube_app
 BUILD    := build_gc
-SOURCES  := . src
-INCLUDES := include .
+SOURCES  := source .
+INCLUDES := include source .
 
 CFLAGS   := -O2 -Wall $(MACHDEP) -DHW_DOL
 CXXFLAGS := $(CFLAGS)
