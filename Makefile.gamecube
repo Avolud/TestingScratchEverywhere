@@ -1,0 +1,47 @@
+# Konfiguracja kompilacji dla GameCube (devkitPPC)
+ifeq ($(strip $(DEVKITPPC)),)
+$(error "Proszę ustawić DEVKITPPC w środowisku.")
+endif
+
+include $(DEVKITPPC)/gamecube_rules
+
+TARGET   := gamecube_app
+BUILD    := build_gc
+SOURCES  := src
+INCLUDES := include
+
+CFLAGS   := -O2 -Wall $(MACHDEP) -DHW_DOL
+CXXFLAGS := $(CFLAGS)
+LDFLAGS  := $(MACHDEP) -L$(LIBOGC_LIB) -logc -lm
+
+ifneq ($(BUILD),$(notdir $(CURDIR)))
+
+export OUTPUT  := $(CURDIR)/$(TARGET)
+export VPATH   := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir))
+export DEPSDIR := $(CURDIR)/$(BUILD)
+
+CFILES   := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
+
+export OFILES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o)
+export INCLUDE := $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) -I$(LIBOGC_INC)
+
+.PHONY: $(BUILD) clean
+
+$(BUILD):
+	@[ -d $@ ] || mkdir -p $@
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile.gamecube
+
+clean:
+	@rm -rf $(BUILD) $(TARGET).elf $(TARGET).dol
+
+else
+
+DEPENDS := $(OFILES:.o=.d)
+
+$(OUTPUT).dol: $(OUTPUT).elf
+$(OUTPUT).elf: $(OFILES)
+
+-include $(DEPENDS)
+
+endif
