@@ -1,4 +1,3 @@
-# Konfiguracja kompilacji dla GameCube (devkitPPC)
 ifeq ($(strip $(DEVKITPPC)),)
 $(error "Proszę ustawić DEVKITPPC w środowisku.")
 endif
@@ -7,8 +6,8 @@ include $(DEVKITPPC)/gamecube_rules
 
 TARGET   := gamecube_app
 BUILD    := build_gc
-SOURCES  := src
-INCLUDES := include
+SOURCES  := . src
+INCLUDES := include .
 
 CFLAGS   := -O2 -Wall $(MACHDEP) -DHW_DOL
 CXXFLAGS := $(CFLAGS)
